@@ -1,7 +1,7 @@
-Flightplanner.com (FAPI) PHP client library
+FuelPlanner.com (FAPI) PHP client library
 ===========================================
 
-A PHP client library for the FlightPlanner.com API, this library enables a simple interface for requesting information from the FuelPlanner.com API.
+A PHP client library for the FuelPlanner.com API, this library enables a simple interface for requesting information from the FuelPlanner.com API.
 
 ## Requirements
 
