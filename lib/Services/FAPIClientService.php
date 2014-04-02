@@ -13,6 +13,11 @@ abstract class FAPIClientService
     const FAPI_URL = 'http://fuelplanner.com/api/fuelapi.php';
 
     /**
+     * Enables testing using some example data without having to register for a full account.
+     */
+    const DEBUG = false;
+
+    /**
      * Guzzle HTTP client instance
      * @var GuzzleHttp\Client
      */
@@ -123,20 +128,26 @@ abstract class FAPIClientService
     protected function send()
     {
 
-        try {
+        if (!self::DEBUG) {
+            try {
 
-            $response = $this->httpClient->post(FAPIClientService::FAPI_URL, $this->getPostRequestBody());
-        } catch (GuzzleHttp\Exception\ClientErrorResponseException $e) {
-            echo $e->getRequest();
-            echo $e->getResponse();
-        } catch (GuzzleHttp\Exception\AdapterException $e) {
-            echo $e->getRequest();
-            echo $e->getResponse();
-        } catch (\InvalidArgumentException $e) {
-            die($e->getMessage());
+                $response = $this->httpClient->post(FAPIClientService::FAPI_URL, $this->getPostRequestBody());
+            } catch (GuzzleHttp\Exception\ClientErrorResponseException $e) {
+                echo $e->getRequest();
+                echo $e->getResponse();
+            } catch (GuzzleHttp\Exception\AdapterException $e) {
+                echo $e->getRequest();
+                echo $e->getResponse();
+            } catch (\InvalidArgumentException $e) {
+                die($e->getMessage());
+            }
+            $this->response = FAPIClientService::remapKeys(json_decode(FAPIClientService::XmlToJson($response->getBody())));
+            
+        } else {
+            
+            // We will use out example data instead of requesting it via the API.
+            $this->response = FAPIClientService::remapKeys('{"DESCRIP":"Airbus A320","NM":"298","HEADING_TC":"333","OEW":"93051","TTL":"31946","ZFW":"124997","FUEL_EFU":"6126","FUEL_RSV":"6898","FUEL_TOF":"13024","TOW":"138021","LWT":"131895","UNDERLOAD":"24047","TIME_BLK":"01:06","TIME_RSV":"01:15","TIME_TTE":"02:21","METAR_ORIG":"EGLL 021120Z 07008KT 9000 NSC 17\/10 Q1004 NOSIG","METAR_DEST":"EGPF 021120Z 07014KT 9999 OVC012 08\/05 Q1008","MESSAGES":{"MESG":"TTL VIA SEATS 179"}}');
         }
-
-        $this->response = FAPIClientService::XmlToJson($response->getBody());
 
         return $this->response;
     }
@@ -240,11 +251,15 @@ abstract class FAPIClientService
         $worker = str_replace(array("\n", "\r", "\t"), '', $xml);
         $worker = trim(str_replace('"', "'", $worker));
         $simpleXml = simplexml_load_string($worker)->children();
+        return $simpleXml;
+    }
 
+    static private function remapKeys($data)
+    {
         // We replace the standard API keys with human readable keys to make it more descriptive when working in our code.
         $api_keys = array('DESCRIP', 'NM', 'HEADING_TC', 'OEW', 'TTL', 'ZFW', 'FUEL_EFU', 'FUEL_RSV', 'FUEL_TOF', 'TOW', 'LWT', 'UNDERLOAD', 'TIME_BLK', 'TIME_RSV', 'TIME_TTE', 'METAR_ORIG', 'METAR_DEST', 'MESSAGES');
         $readable_keys = array('airframe', 'distance', 'initialHeading', 'operatingEmtpyWeight', 'totalTrafficLoad', 'zeroFuelWeight', 'estimatedFuelUsage', 'reserveFuel', 'takeoffFuel', 'takeoffWeight', 'estimatedLandingWeight', 'calculatedUnderload', 'estimateTimeEnrouteBlock', 'reserveFuelTime', 'estimateTimeEnroute', 'metarDeparture', 'metarDestination', 'messages');
-        $replacement = str_replace($api_keys, $readable_keys, json_encode($simpleXml));
+        $replacement = str_replace($api_keys, $readable_keys, $data);
 
         return json_decode($replacement);
     }
