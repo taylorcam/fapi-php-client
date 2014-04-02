@@ -75,6 +75,43 @@ abstract class FAPIClientService
      */
     protected $icaoFrom;
 
+    /**
+     * Sets the total traffic weight.
+     * @var int Optional. Total traffic weight. 
+     */
+    protected $ttl;
+
+    /**
+     * Sets the operating empty weight.
+     * @var int Optional. Operating emtpy weight. 
+     */
+    protected $oew;
+
+    /**
+     * Sets the maximum fuel weight.
+     * @var int Optional. Maximum fuel weight (fuel capactiy) 
+     */
+    protected $mtank;
+
+    /**
+     * Extra fuel (in pounds) used for tanker aircraft.
+     * @var int Optional. Extra fuel, in pounds (LBS). Use keyword AUTO to calculate tankering fuel for a round-trip. Use keyword MAX to calculate maximum tankering fuel 
+     */
+    protected $tanker;
+
+    /**
+     * Return departure and destination airport METAR details.
+     * @var boolean Optional. If YES, then fueplanner will attempt to find weather data for ORIG and DEST. 
+     */
+    protected $metar;
+    
+    
+    /**
+     * Stores the request result as a JOSN object
+     * 
+     */
+    private $response;
+
     public function __construct()
     {
         $this->httpClient = new HttpClient;
@@ -90,6 +127,7 @@ abstract class FAPIClientService
         try {
 
             $response = $this->httpClient->post(FAPIClientService::FAPI_URL, $this->getPostRequestBody());
+            
         } catch (GuzzleHttp\Exception\ClientErrorResponseException $e) {
             echo $e->getRequest();
             echo $e->getResponse();
@@ -100,12 +138,9 @@ abstract class FAPIClientService
             die($e->getMessage());
         }
 
-        /**
-         * For debugging reasons you can uncomment this to 'view source' the XML layout.
-         */
-        //die($response->getBody());
-
-        return $response->xml();
+        $this->response = $response;
+        
+        return $this->response;
     }
 
     /**
@@ -116,20 +151,73 @@ abstract class FAPIClientService
     {
         $config['body'] = [
             'QUERY' => $this->query,
-            'RULES' => $this->rules,
             'USER' => $this->user,
             'ACCOUNT' => $this->account,
             'LICENSE' => $this->license,
-            'ORIG' => $this->icaoFrom,
-            'DEST' => $this->icaoTo,
-            'EQPT' => $this->airframe,
         ];
+
+        if ($this->icaoFrom) {
+            $config['body']['ORIG'] = $this->icaoFrom;
+        }
+
+        if ($this->icaoTo) {
+            $config['body']['DEST'] = $this->icaoTo;
+        }
+
+        if ($this->airframe) {
+            $config['body']['EQPT'] = $this->airframe;
+        }
+
+        if ($this->rules) {
+            $config['body']['RULES'] = $this->rules;
+        }
+
+        if ($this->ttl) {
+            $config['body']['TTL'] = $this->ttl;
+        }
+
+        if ($this->oew) {
+            $config['body']['OEW'] = $this->oew;
+        }
+
+        if ($this->mtank) {
+            $config['body']['MTANK'] = $this->mtank;
+        }
+
+        if ($this->tanker) {
+            $config['body']['TANKER'] = $this->tanker;
+        }
+
+        if ($this->metar) {
+            $config['body']['METAR'] = $this->metar;
+        }
 
         if ($this->proxy) {
             $config['proxy'] = $this->proxy;
         }
 
         return $config;
+    }
+
+    /**
+     * Requests the avaliable types of aircraft from the API.
+     * @todo APPEARS THAT THE XML IS BROKEN AT THE API END, WILL INVESTIGATE LATER!
+     * @return type
+     */
+    public function supportedAircraft()
+    {
+        $this->query = 'LIST_E';
+        $result = $this->send();
+
+        //echo $result->getBody();
+
+        $xml = $result->xml();
+
+        //die(var_dump($xml));
+
+        foreach ($xml->EQPTLIST as $airframe) {
+            echo $airframe->ID . " :: " . $airframe->DESCRIP;
+        }
     }
 
 }

@@ -25,7 +25,8 @@ class FAPIClient extends Services\FAPIClientService
      */
     public function get()
     {
-        return $this->send();
+        $response = $this->send();
+        return $response->xml();
     }
 
     /**
@@ -92,6 +93,66 @@ class FAPIClient extends Services\FAPIClientService
     public function from($from)
     {
         $this->icaoFrom = $from;
+        return $this;
+    }
+
+    /**
+     * Sets the 'Total traffic load' (optional)
+     * @param int $ttl Total traffic load.
+     * @return \Ballen\FuelPlannerClient\FAPIClient
+     */
+    public function totalTrafficLoad($ttl)
+    {
+        $this->ttl = $ttl;
+        return $this;
+    }
+
+    /**
+     * Sets the 'Operating empty weight' (optional)
+     * @param int $oew Operating empty weight.
+     * @return \Ballen\FuelPlannerClient\FAPIClient
+     */
+    public function operatingEmtpyWeight($oew)
+    {
+        $this->oew = $oew;
+        return $this;
+    }
+
+    /**
+     * Fuel capacity (i.e., maximum fuel weight)
+     * @param int $fuel Maximum fuel weight.
+     * @return \Ballen\FuelPlannerClient\FAPIClient
+     */
+    public function fuelCapacity($fuel)
+    {
+        $this->mtank = $fuel;
+        return $this;
+    }
+
+    /**
+     * Extra fuel carried (for use with Tankers etc), Use keyword AUTO to calculate tankering fuel for a round-trip. Use keyword MAX to calculate maximum tankering fuel
+     * @param int $fuel The amount of extra fuel carried (in pounds (LBS))
+     * @see http://fuelplanner.com/api.php
+     * @return \Ballen\FuelPlannerClient\FAPIClient
+     */
+    public function fuelTanker($fuel)
+    {
+        $this->tanker = $fuel;
+        return $this;
+    }
+
+    /**
+     * Request that the departure and destination METAR details are also returned.
+     * @param boolean $show
+     * @return \Ballen\FuelPlannerClient\FAPIClient
+     */
+    public function metar($show = true)
+    {
+        if ($show) {
+            $this->metar = 'YES';
+        } else {
+            $this->metar = 'NO';
+        }
         return $this;
     }
 

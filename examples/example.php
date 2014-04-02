@@ -7,9 +7,10 @@ $test = new Ballen\FuelPlannerClient\FAPIClient(
 );
 
 // Lets configure our aircraft and set our departure and destination airports!
-$response = $test->aircraft('A320')->from('EGSS')->to('LOWS');
+$response = $test->aircraft('A320')->from('EGLL')->to('EGPF')->metar();
 
-$result = $response->get();
+var_dump($response->get());
 
-var_dump($result);
+
+//var_dump($test->supportedAircraft());
 
