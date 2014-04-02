@@ -5,19 +5,17 @@ namespace Ballen\FuelPlannerClient;
 class FAPIClient extends Services\FAPIClientService
 {
 
-    public function __construct($user = null, $account = null, $license = null)
+    /**
+     * @param string $user The FAPI username (eg. 'ballen@bobbyallen.me').
+     * @param string $account The FAPI account ID (eg. '0ed72374a96ba324896e7b5ac4cffff8')
+     * @param string $license The FAPI license key (eg.  '8D0676A8')
+     */
+    public function __construct($user, $account, $license)
     {
+        $this->setUsername($user);
+        $this->setAccount($account);
+        $this->setLicense($license);
 
-        if ($user) {
-            $this->setUsername($user);
-        }
-        if ($account) {
-            $this->setAccount($account);
-        }
-        if ($license) {
-            $this->setLicense($license);
-        }
-        
         parent::__construct();
     }
 
@@ -35,7 +33,7 @@ class FAPIClient extends Services\FAPIClientService
      * @param string $user The FAPI username (email address) eg. 'ballen@bobbyallen.me'
      * @return \Ballen\FuelPlannerClient\FAPIClient
      */
-    public function setUsername($user)
+    private function setUsername($user)
     {
         $this->user = $user;
         return $this;
@@ -46,7 +44,7 @@ class FAPIClient extends Services\FAPIClientService
      * @param string $license The FAPI license key for your account eg. '0ed72374a96ba324896e7b5ac4cffff8'
      * @return \Ballen\FuelPlannerClient\FAPIClient
      */
-    public function setLicense($license)
+    private function setLicense($license)
     {
         $this->license = $license;
         return $this;
@@ -57,7 +55,7 @@ class FAPIClient extends Services\FAPIClientService
      * @param string $account The FAPI account ID eg. '8D0676A8'
      * @return \Ballen\FuelPlannerClient\FAPIClient
      */
-    public function setAccount($account)
+    private function setAccount($account)
     {
         $this->account = $account;
         return $this;

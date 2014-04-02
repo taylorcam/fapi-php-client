@@ -90,13 +90,14 @@ abstract class FAPIClientService
         try {
 
             $response = $this->httpClient->post(FAPIClientService::FAPI_URL, $this->getPostRequestBody());
-            
         } catch (GuzzleHttp\Exception\ClientErrorResponseException $e) {
             echo $e->getRequest();
             echo $e->getResponse();
         } catch (GuzzleHttp\Exception\AdapterException $e) {
             echo $e->getRequest();
             echo $e->getResponse();
+        } catch (\InvalidArgumentException $e) {
+            die($e->getMessage());
         }
 
         /**
