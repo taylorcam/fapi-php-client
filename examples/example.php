@@ -15,3 +15,5 @@ echo 'Aircraft: ' . $response->get()->airframe . '<br>';
 echo 'Inital heading: ' . $response->get()->initialHeading . '<br>';
 echo 'Fuel usage (estimated): ' . number_format($response->get()->estimatedFuelUsage) . 'lbs / ' .number_format(($response->get()->estimatedFuelUsage / 2.20462), 2). ' kgs  / ' .number_format(($response->get()->estimatedFuelUsage / 2204.62), 5). ' metric tonnes <br>';
 
+//echo 'Gallons of fuel (estimated): ' . Ballen\FuelPlannerClient\Services\FAPIClientService::lbsToGallons($response->get()->estimatedFuelUsage) . ' gallons.';
+

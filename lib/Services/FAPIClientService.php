@@ -142,6 +142,39 @@ abstract class FAPIClientService
     }
 
     /**
+     * Set the FAPI username (email address) of which is permitted to access the API. 
+     * @param string $user The FAPI username (email address) eg. 'ballen@bobbyallen.me'
+     * @return \Ballen\FuelPlannerClient\FAPIClient
+     */
+    protected function setUsername($user)
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * Set the license key provided by FuelPlanner.com of which is permitted to access the API.
+     * @param string $license The FAPI license key for your account eg. '0ed72374a96ba324896e7b5ac4cffff8'
+     * @return \Ballen\FuelPlannerClient\FAPIClient
+     */
+    protected function setLicense($license)
+    {
+        $this->license = $license;
+        return $this;
+    }
+
+    /**
+     * Set the genearted Account ID for the FuelPlanner.com API of which is permitted to access the API.
+     * @param string $account The FAPI account ID eg. '8D0676A8'
+     * @return \Ballen\FuelPlannerClient\FAPIClient
+     */
+    protected function setAccount($account)
+    {
+        $this->account = $account;
+        return $this;
+    }
+
+    /**
      * Builds the API POST request body.
      * @return array
      */
@@ -214,6 +247,47 @@ abstract class FAPIClientService
         $replacement = str_replace($api_keys, $readable_keys, json_encode($simpleXml));
 
         return json_decode($replacement);
+    }
+
+    /**
+     * Helper static method to convert weight from pounds (lbs) to kilograms (kgs)
+     * @param float $lbs The weight in pounds (lbs) of which to be converted to kilograms (kgs)
+     * @return float The weight conversion in kilograms (kgs).
+     */
+    static public function lbsToKgs($lbs)
+    {
+        return ($lbs / 2.20462);
+    }
+
+    /**
+     * Helper static method to convert weight from pounds (lbs) to metric tonnes (mt)
+     * @param float $lbs The weight in pounds (lbs) of which to be converted to metric tonnes (mts)
+     * @return float The weight conversion in metric tonnes (mts).
+     */
+    static public function lbsToTonnes($lbs)
+    {
+        return ($lbs / 2204.62);
+    }
+
+    /**
+     * Helper static method to convert weight from pounds (lbs) to gallons (based on average of 6.71lb per gallon).
+     * @param float $lbs The weight in pounds (lbs) of which to be converted to gallons.
+     * @return float The volume conversion in gallons.
+     */
+    static public function lbsToGallons($lbs)
+    {
+        return ($lbs / 6.71);
+    }
+
+    /**
+     * Helper static method to convert weight from pounds (lbs) to litres (ltrs) (based on average of 6.71lb per gallon * 4.54609).
+     * @param float $lbs The weight in pounds (lbs) of which to be converted to litres.
+     * @return float The volume conversion in litres.
+     */
+    static public function lbsToLitres($lbs)
+    {
+        $gallons = self::lbsToGallons($lbs);
+        return ($gallons * 4.54609);
     }
 
 }
