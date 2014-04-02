@@ -3,6 +3,8 @@
 namespace Ballen\FuelPlannerClient\Services;
 
 use GuzzleHttp\Client as HttpClient;
+use Ballen\FuelPlannerClient\Types\Weight;
+use Ballen\FuelPlannerClient\Types\Distance;
 
 abstract class FAPIClientService
 {
@@ -15,7 +17,7 @@ abstract class FAPIClientService
     /**
      * Enables testing using some example data without having to register for a full account.
      */
-    const DEBUG = false;
+    const DEBUG = true;
 
     /**
      * Guzzle HTTP client instance
@@ -142,9 +144,8 @@ abstract class FAPIClientService
                 die($e->getMessage());
             }
             $this->response = FAPIClientService::remapKeys(json_decode(FAPIClientService::XmlToJson($response->getBody())));
-            
         } else {
-            
+
             // We will use out example data instead of requesting it via the API.
             $this->response = FAPIClientService::remapKeys('{"DESCRIP":"Airbus A320","NM":"298","HEADING_TC":"333","OEW":"93051","TTL":"31946","ZFW":"124997","FUEL_EFU":"6126","FUEL_RSV":"6898","FUEL_TOF":"13024","TOW":"138021","LWT":"131895","UNDERLOAD":"24047","TIME_BLK":"01:06","TIME_RSV":"01:15","TIME_TTE":"02:21","METAR_ORIG":"EGLL 021120Z 07008KT 9000 NSC 17\/10 Q1004 NOSIG","METAR_DEST":"EGPF 021120Z 07014KT 9999 OVC012 08\/05 Q1008","MESSAGES":{"MESG":"TTL VIA SEATS 179"}}');
         }
@@ -254,55 +255,28 @@ abstract class FAPIClientService
         return $simpleXml;
     }
 
+    /**
+     * Here we remap the API response keys to friendlier, more read-able keys we also create new 'weight' objects to allow nice conversions.
+     * @param string $data API response data.
+     * @return \stdClass
+     */
     static private function remapKeys($data)
     {
-        // We replace the standard API keys with human readable keys to make it more descriptive when working in our code.
         $api_keys = array('DESCRIP', 'NM', 'HEADING_TC', 'OEW', 'TTL', 'ZFW', 'FUEL_EFU', 'FUEL_RSV', 'FUEL_TOF', 'TOW', 'LWT', 'UNDERLOAD', 'TIME_BLK', 'TIME_RSV', 'TIME_TTE', 'METAR_ORIG', 'METAR_DEST', 'MESSAGES');
         $readable_keys = array('airframe', 'distance', 'initialHeading', 'operatingEmtpyWeight', 'totalTrafficLoad', 'zeroFuelWeight', 'estimatedFuelUsage', 'reserveFuel', 'takeoffFuel', 'takeoffWeight', 'estimatedLandingWeight', 'calculatedUnderload', 'estimateTimeEnrouteBlock', 'reserveFuelTime', 'estimateTimeEnroute', 'metarDeparture', 'metarDestination', 'messages');
         $replacement = str_replace($api_keys, $readable_keys, $data);
 
-        return json_decode($replacement);
-    }
+        $object = json_decode($replacement);
 
-    /**
-     * Helper static method to convert weight from pounds (lbs) to kilograms (kgs)
-     * @param float $lbs The weight in pounds (lbs) of which to be converted to kilograms (kgs)
-     * @return float The weight conversion in kilograms (kgs).
-     */
-    static public function lbsToKgs($lbs)
-    {
-        return ($lbs / 2.20462);
-    }
+        $object->distance = new Distance($object->distance);
+        $object->zeroFuelWeight = new Weight($object->zeroFuelWeight);
+        $object->estimatedFuelUsage = new Weight($object->estimatedFuelUsage);
+        $object->reserveFuel = new Weight($object->reserveFuel);
+        $object->takeoffFuel = new Weight($object->takeoffFuel);
+        $object->estimatedLandingWeight = new Weight($object->estimatedLandingWeight);
+        $object->calculatedUnderload = new Weight($object->calculatedUnderload);
 
-    /**
-     * Helper static method to convert weight from pounds (lbs) to metric tonnes (mt)
-     * @param float $lbs The weight in pounds (lbs) of which to be converted to metric tonnes (mts)
-     * @return float The weight conversion in metric tonnes (mts).
-     */
-    static public function lbsToTonnes($lbs)
-    {
-        return ($lbs / 2204.62);
-    }
-
-    /**
-     * Helper static method to convert weight from pounds (lbs) to gallons (based on average of 6.71lb per gallon).
-     * @param float $lbs The weight in pounds (lbs) of which to be converted to gallons.
-     * @return float The volume conversion in gallons.
-     */
-    static public function lbsToGallons($lbs)
-    {
-        return ($lbs / 6.71);
-    }
-
-    /**
-     * Helper static method to convert weight from pounds (lbs) to litres (ltrs) (based on average of 6.71lb per gallon * 4.54609).
-     * @param float $lbs The weight in pounds (lbs) of which to be converted to litres.
-     * @return float The volume conversion in litres.
-     */
-    static public function lbsToLitres($lbs)
-    {
-        $gallons = self::lbsToGallons($lbs);
-        return ($gallons * 4.54609);
+        return $object;
     }
 
 }

@@ -2,18 +2,26 @@
 
 require '../vendor/autoload.php';
 
-$test = new Ballen\FuelPlannerClient\FAPIClient(
-        'ballen@bobbyallen.me', '8D0676A8', '0ed72374a96ba324896e7b5ac4cffff8'
+use Ballen\FuelPlannerClient\FAPIClient;
+
+$fuel_client = new FAPIClient(
+        'ballen@bobbyallen.me', // Your 'user' account (email addres)
+        '8D0676A8', // Your generated account ID.
+        '0ed72374a96ba324896e7b5ac4cffff8' // Your license key.
 );
 
-// Lets configure our aircraft and set our departure and destination airports!
-$response = $test->aircraft('A320')->from('EGLL')->to('EGPF')->metar();
+$response = $fuel_client->aircraft('A320') // Set your aircraft type.
+        ->from('EGLL') // Set the departure airport.
+        ->to('EGPF') // Set the destination airport.
+        ->metar() // Also request both departure and destination.
+        ->get(); // We now get the response from the web service!
 
 
-
-echo 'Aircraft: ' . $response->get()->airframe . '<br>';
-echo 'Inital heading: ' . $response->get()->initialHeading . '<br>';
-echo 'Fuel usage (estimated): ' . number_format($response->get()->estimatedFuelUsage) . 'lbs / ' .number_format(($response->get()->estimatedFuelUsage / 2.20462), 2). ' kgs  / ' .number_format(($response->get()->estimatedFuelUsage / 2204.62), 5). ' metric tonnes <br>';
-
-//echo 'Gallons of fuel (estimated): ' . Ballen\FuelPlannerClient\Services\FAPIClientService::lbsToGallons($response->get()->estimatedFuelUsage) . ' gallons.';
+/**
+ * Now we'll display some pretty standard infomation as an example...
+ */
+echo 'Aircraft: ' . $response->airframe . '<br>';
+echo 'Inital heading: ' . $response->initialHeading . '<br>';
+echo 'Fuel usage (estimated): ' . number_format($response->estimatedFuelUsage->lbs()) . 'lbs / ' . number_format($response->estimatedFuelUsage->kgs(), 2) . ' kgs  / ' . number_format($response->estimatedFuelUsage->tonnes(), 5) . ' metric tonnes.<br>';
+echo 'Gallons of fuel (estimated): ' . $response->estimatedFuelUsage->gallons() . ' gallons.';
 
