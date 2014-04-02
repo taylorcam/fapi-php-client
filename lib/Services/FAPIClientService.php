@@ -104,8 +104,7 @@ abstract class FAPIClientService
      * @var boolean Optional. If YES, then fueplanner will attempt to find weather data for ORIG and DEST. 
      */
     protected $metar;
-    
-    
+
     /**
      * Stores the request result as a JOSN object
      * 
@@ -127,7 +126,6 @@ abstract class FAPIClientService
         try {
 
             $response = $this->httpClient->post(FAPIClientService::FAPI_URL, $this->getPostRequestBody());
-            
         } catch (GuzzleHttp\Exception\ClientErrorResponseException $e) {
             echo $e->getRequest();
             echo $e->getResponse();
@@ -138,8 +136,8 @@ abstract class FAPIClientService
             die($e->getMessage());
         }
 
-        $this->response = $response;
-        
+        $this->response = FAPIClientService::XmlToJson($response->getBody());
+
         return $this->response;
     }
 
@@ -200,24 +198,22 @@ abstract class FAPIClientService
     }
 
     /**
-     * Requests the avaliable types of aircraft from the API.
-     * @todo APPEARS THAT THE XML IS BROKEN AT THE API END, WILL INVESTIGATE LATER!
-     * @return type
+     * Converts XML to a JSON object.
+     * @param string $xml The XML body
+     * @return stdObject
      */
-    public function supportedAircraft()
+    static private function XmlToJson($xml)
     {
-        $this->query = 'LIST_E';
-        $result = $this->send();
+        $worker = str_replace(array("\n", "\r", "\t"), '', $xml);
+        $worker = trim(str_replace('"', "'", $worker));
+        $simpleXml = simplexml_load_string($worker)->children();
 
-        //echo $result->getBody();
+        // We replace the standard API keys with human readable keys to make it more descriptive when working in our code.
+        $api_keys = array('DESCRIP', 'NM', 'HEADING_TC', 'OEW', 'TTL', 'ZFW', 'FUEL_EFU', 'FUEL_RSV', 'FUEL_TOF', 'TOW', 'LWT', 'UNDERLOAD', 'TIME_BLK', 'TIME_RSV', 'TIME_TTE', 'METAR_ORIG', 'METAR_DEST', 'MESSAGES');
+        $readable_keys = array('airframe', 'distance', 'initialHeading', 'operatingEmtpyWeight', 'totalTrafficLoad', 'zeroFuelWeight', 'estimatedFuelUsage', 'reserveFuel', 'takeoffFuel', 'takeoffWeight', 'estimatedLandingWeight', 'calculatedUnderload', 'estimateTimeEnrouteBlock', 'reserveFuelTime', 'estimateTimeEnroute', 'metarDeparture', 'metarDestination', 'messages');
+        $replacement = str_replace($api_keys, $readable_keys, json_encode($simpleXml));
 
-        $xml = $result->xml();
-
-        //die(var_dump($xml));
-
-        foreach ($xml->EQPTLIST as $airframe) {
-            echo $airframe->ID . " :: " . $airframe->DESCRIP;
-        }
+        return json_decode($replacement);
     }
 
 }

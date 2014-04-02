@@ -26,7 +26,7 @@ class FAPIClient extends Services\FAPIClientService
     public function get()
     {
         $response = $this->send();
-        return $response->xml();
+        return $response;
     }
 
     /**
