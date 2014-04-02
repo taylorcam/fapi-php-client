@@ -5,8 +5,19 @@ namespace Ballen\FuelPlannerClient;
 class FAPIClient extends Services\FAPIClientService
 {
 
-    public function __construct()
+    public function __construct($user = null, $account = null, $license = null)
     {
+
+        if ($user) {
+            $this->setUsername($user);
+        }
+        if ($account) {
+            $this->setAccount($account);
+        }
+        if ($license) {
+            $this->setLicense($license);
+        }
+        
         parent::__construct();
     }
 
