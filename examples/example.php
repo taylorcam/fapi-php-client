@@ -9,8 +9,9 @@ $test = new Ballen\FuelPlannerClient\FAPIClient(
 // Lets configure our aircraft and set our departure and destination airports!
 $response = $test->aircraft('A320')->from('EGLL')->to('EGPF')->metar();
 
-echo 'Aircraft: ' . $response->get()->airframe . '<br>';
 
+
+echo 'Aircraft: ' . $response->get()->airframe . '<br>';
 echo 'Inital heading: ' . $response->get()->initialHeading . '<br>';
-echo 'Fuel usage (estimated): ' . number_format($response->get()->estimatedFuelUsage) . 'lbs / ' .number_format(($response->get()->estimatedFuelUsage / 2204.62 * 1000)). ' kgs  / ' .($response->get()->estimatedFuelUsage / 2204.62). ' metric tonnes <br>';
+echo 'Fuel usage (estimated): ' . number_format($response->get()->estimatedFuelUsage) . 'lbs / ' .number_format(($response->get()->estimatedFuelUsage / 2.20462), 2). ' kgs  / ' .number_format(($response->get()->estimatedFuelUsage / 2204.62), 5). ' metric tonnes <br>';
 
