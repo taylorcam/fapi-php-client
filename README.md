@@ -14,11 +14,7 @@ This client library is released under the [LICENSE](GPLv3), you are welcome to u
 
 ## Examples
 
-Coming soon...
-
 ```php
-<?php
-
 <?php
 
 use Ballen\FuelPlannerClient\FAPIClient;

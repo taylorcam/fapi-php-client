@@ -2,7 +2,7 @@
 
 namespace Ballen\FuelPlannerClient\Exceptions;
 
-class InvalidDistanceException extends \Exception
+class InvalidAircraftException extends \Exception
 {
     
 }
