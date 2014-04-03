@@ -278,7 +278,6 @@ abstract class FAPIClientService
         $object->estimatedLandingWeight = new Weight($object->estimatedLandingWeight);
         $object->calculatedUnderload = new Weight($object->calculatedUnderload);
 
-
         return $object;
     }
 

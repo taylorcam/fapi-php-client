@@ -41,6 +41,11 @@ echo 'Fuel usage (estimated): ' . number_format($response->estimatedFuelUsage->l
 echo 'Gallons of fuel (estimated): ' . $response->estimatedFuelUsage->gallons() . ' gallons (' .$response->estimatedFuelUsage->litres(). ' litres).<br><br>';
 echo 'Total flight distance: ' .$response->distance->nm(). ' nautical miles which is also converted to ' .$response->distance->km(). ' kilometers (' .$response->distance->mi(). ') and as meters ' .$response->distance->m(). ' (' .$response->distance->ft(). ' ft).';
 
+echo '<PRE>';
+echo 'Departure METAR: ' . $response->metarDeparture . PHP_EOL;
+echo 'Destination METAR: ' . $response->metarDestination;
+echo '</PRE>';
+
 ```
 
 ## Support
