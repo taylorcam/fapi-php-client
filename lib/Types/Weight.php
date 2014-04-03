@@ -17,7 +17,7 @@ class Weight
      * Initiate the object with the weight in pounds (lbs)
      * @param float $lbs The weight in pounds.
      */
-    public function __construct($lbs)
+    public function __construct($lbs = null)
     {
         if (is_null($lbs)) {
             throw new InvalidWeightException;
