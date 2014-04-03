@@ -3,6 +3,7 @@
 namespace Ballen\FuelPlannerClient\Services;
 
 use GuzzleHttp\Client as HttpClient;
+use Ballen\FuelPlannerClient\Types\Aircraft;
 use Ballen\FuelPlannerClient\Types\Weight;
 use Ballen\FuelPlannerClient\Types\Distance;
 
@@ -68,7 +69,7 @@ abstract class FAPIClientService
      * @var string The aircraft ICAO code.
      * @see http://fuelplanner.com/api.php
      */
-    protected $airframe;
+    protected $airframeIcao;
 
     /**
      * Sets the destination airport.
@@ -143,11 +144,11 @@ abstract class FAPIClientService
             } catch (\InvalidArgumentException $e) {
                 die($e->getMessage());
             }
-            $this->response = FAPIClientService::remapKeys(json_decode(FAPIClientService::XmlToJson($response->getBody())));
+            $this->response = FAPIClientService::remapKeys(json_decode(FAPIClientService::XmlToJson($response->getBody())), $this->airframeIcao);
         } else {
 
             // We will use out example data instead of requesting it via the API.
-            $this->response = FAPIClientService::remapKeys('{"DESCRIP":"Airbus A320","NM":"298","HEADING_TC":"333","OEW":"93051","TTL":"31946","ZFW":"124997","FUEL_EFU":"6126","FUEL_RSV":"6898","FUEL_TOF":"13024","TOW":"138021","LWT":"131895","UNDERLOAD":"24047","TIME_BLK":"01:06","TIME_RSV":"01:15","TIME_TTE":"02:21","METAR_ORIG":"EGLL 021120Z 07008KT 9000 NSC 17\/10 Q1004 NOSIG","METAR_DEST":"EGPF 021120Z 07014KT 9999 OVC012 08\/05 Q1008","MESSAGES":{"MESG":"TTL VIA SEATS 179"}}');
+            $this->response = FAPIClientService::remapKeys('{"DESCRIP":"Airbus A320","NM":"298","HEADING_TC":"333","OEW":"93051","TTL":"31946","ZFW":"124997","FUEL_EFU":"6126","FUEL_RSV":"6898","FUEL_TOF":"13024","TOW":"138021","LWT":"131895","UNDERLOAD":"24047","TIME_BLK":"01:06","TIME_RSV":"01:15","TIME_TTE":"02:21","METAR_ORIG":"EGLL 021120Z 07008KT 9000 NSC 17\/10 Q1004 NOSIG","METAR_DEST":"EGPF 021120Z 07014KT 9999 OVC012 08\/05 Q1008","MESSAGES":{"MESG":"TTL VIA SEATS 179"}}', $this->airframeIcao);
         }
 
         return $this->response;
@@ -208,7 +209,7 @@ abstract class FAPIClientService
         }
 
         if ($this->airframe) {
-            $config['body']['EQPT'] = $this->airframe;
+            $config['body']['EQPT'] = $this->airframeIcao;
         }
 
         if ($this->rules) {
@@ -260,7 +261,7 @@ abstract class FAPIClientService
      * @param string $data API response data.
      * @return \stdClass
      */
-    static private function remapKeys($data)
+    static private function remapKeys($data, $airframeIcao)
     {
         $api_keys = array('DESCRIP', 'NM', 'HEADING_TC', 'OEW', 'TTL', 'ZFW', 'FUEL_EFU', 'FUEL_RSV', 'FUEL_TOF', 'TOW', 'LWT', 'UNDERLOAD', 'TIME_BLK', 'TIME_RSV', 'TIME_TTE', 'METAR_ORIG', 'METAR_DEST', 'MESSAGES');
         $readable_keys = array('airframe', 'distance', 'initialHeading', 'operatingEmtpyWeight', 'totalTrafficLoad', 'zeroFuelWeight', 'estimatedFuelUsage', 'reserveFuel', 'takeoffFuel', 'takeoffWeight', 'estimatedLandingWeight', 'calculatedUnderload', 'estimateTimeEnrouteBlock', 'reserveFuelTime', 'estimateTimeEnroute', 'metarDeparture', 'metarDestination', 'messages');
@@ -269,12 +270,14 @@ abstract class FAPIClientService
         $object = json_decode($replacement);
 
         $object->distance = new Distance($object->distance);
+        $object->airframe = new Aircraft($airframeIcao, $object->airframe);
         $object->zeroFuelWeight = new Weight($object->zeroFuelWeight);
         $object->estimatedFuelUsage = new Weight($object->estimatedFuelUsage);
         $object->reserveFuel = new Weight($object->reserveFuel);
         $object->takeoffFuel = new Weight($object->takeoffFuel);
         $object->estimatedLandingWeight = new Weight($object->estimatedLandingWeight);
         $object->calculatedUnderload = new Weight($object->calculatedUnderload);
+
 
         return $object;
     }

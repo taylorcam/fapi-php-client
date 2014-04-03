@@ -37,7 +37,7 @@ class FAPIClient extends Services\FAPIClientService
      */
     public function aircraft($aircraft)
     {
-        $this->airframe = $aircraft;
+        $this->airframeIcao = $aircraft;
         return $this;
     }
 
