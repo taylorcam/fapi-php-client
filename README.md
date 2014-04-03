@@ -10,7 +10,7 @@ A PHP client library for the FuelPlanner.com API, this library enables a simple 
 
 ## License
 
-This client library is released under the [LICENSE](GPLv3), you are welcome to use it, improve it and contribute your changes back!
+This client library is released under the [GPLv3](LICENSE) license, you are welcome to use it, improve it and contribute your changes back!
 
 ## Examples
 
@@ -41,9 +41,10 @@ echo 'Fuel usage (estimated): ' . number_format($response->estimatedFuelUsage->l
 echo 'Gallons of fuel (estimated): ' . $response->estimatedFuelUsage->gallons() . ' gallons (' .$response->estimatedFuelUsage->litres(). ' litres).<br><br>';
 echo 'Total flight distance: ' .$response->distance->nm(). ' nautical miles which is also converted to ' .$response->distance->km(). ' kilometers (' .$response->distance->mi(). ') and as meters ' .$response->distance->m(). ' (' .$response->distance->ft(). ' ft).';
 
+echo '<h2>METAR</h2>';
 echo '<PRE>';
-echo 'Departure METAR: ' . $response->metarDeparture . PHP_EOL;
-echo 'Destination METAR: ' . $response->metarDestination;
+echo 'Departure: ' . $response->metarDeparture . PHP_EOL;
+echo 'Destination: ' . $response->metarDestination;
 echo '</PRE>';
 
 ```

@@ -271,10 +271,13 @@ abstract class FAPIClientService
 
         $object->distance = new Distance($object->distance);
         $object->airframe = new Aircraft($airframeIcao, $object->airframe);
+        $object->operatingEmtpyWeight = new Weight($object->operatingEmtpyWeight);
+        $object->totalTrafficLoad = new Weight($object->totalTrafficLoad);
         $object->zeroFuelWeight = new Weight($object->zeroFuelWeight);
         $object->estimatedFuelUsage = new Weight($object->estimatedFuelUsage);
         $object->reserveFuel = new Weight($object->reserveFuel);
         $object->takeoffFuel = new Weight($object->takeoffFuel);
+        $object->takeoffWeight = new Weight($object->takeoffWeight);
         $object->estimatedLandingWeight = new Weight($object->estimatedLandingWeight);
         $object->calculatedUnderload = new Weight($object->calculatedUnderload);
 
