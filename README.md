@@ -19,6 +19,8 @@ Coming soon...
 ```php
 <?php
 
+<?php
+
 use Ballen\FuelPlannerClient\FAPIClient;
 
 $fuel_client = new FAPIClient(
@@ -35,12 +37,13 @@ $response = $fuel_client->aircraft('A320') // Set your aircraft type.
 
 
 /**
- * Now we'll display some pretty standard information as an example...
+ * Now we'll display some pretty standard infomation as an example...
  */
-echo 'Aircraft: ' . $response->airframe . '<br>';
+echo 'Aircraft: ' . $response->airframe->name() . ' (' .$response->airframe->icao(). ')<br>';
 echo 'Inital heading: ' . $response->initialHeading . '<br>';
 echo 'Fuel usage (estimated): ' . number_format($response->estimatedFuelUsage->lbs()) . 'lbs / ' . number_format($response->estimatedFuelUsage->kgs(), 2) . ' kgs  / ' . number_format($response->estimatedFuelUsage->tonnes(), 5) . ' metric tonnes.<br>';
-echo 'Gallons of fuel (estimated): ' . $response->estimatedFuelUsage->gallons() . ' gallons.';
+echo 'Gallons of fuel (estimated): ' . $response->estimatedFuelUsage->gallons() . ' gallons (' .$response->estimatedFuelUsage->litres(). ' litres).<br><br>';
+echo 'Total flight distance: ' .$response->distance->nm(). ' nautical miles which is also converted to ' .$response->distance->km(). ' kilometers (' .$response->distance->mi(). ') and as meters ' .$response->distance->m(). ' (' .$response->distance->ft(). ' ft).';
 
 ```
 
